@@ -7,9 +7,9 @@ version:             0.1.0.0
 -- synopsis:
 -- description:
 -- bug-reports:
--- license:
+license:             MIT
 license-file:        LICENSE
--- author:
+author:              kromgart@gmail.com
 -- maintainer:
 -- copyright:
 -- category:
