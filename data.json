@@ -1,0 +1,46 @@
+{
+    "random_effects":[
+        {
+            "flavor": "common",
+            "tiers": [
+                { "id": "1",
+                  "scripts" : [
+                    "GTAR"
+                  ]
+                }
+            ]
+        }
+    ],
+
+    "areas":[
+        {
+            "id":"AR2602",
+            "groups":[
+                {
+                    "id":"1",
+                    "use":"all",
+                    "traps":[
+                        {
+                            "id":"1",
+                            "detect":"20~5",
+                            "disarm":"30-35",
+                            "effect":{
+                                "type":"fixed",
+                                "script":"GTAR"
+                            },
+                            "geometry": {
+                                "type": "points",
+                                "points": [
+                                    "470,277",
+                                    "447,342",
+                                    "469,348",
+                                    "489,285"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
