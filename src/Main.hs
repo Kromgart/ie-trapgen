@@ -9,15 +9,22 @@ import Data.List ()
 import Data.Monoid ((<>))
 import Data.Text (Text, pack, unpack, intercalate)
 
+import System.Environment (getArgs)
 import System.IO (writeFile)
 
 
 main :: IO ()
 --main = readFile "./data.json" >>= putStrLn
-main = do ep <- readParameters "./data.json"
-          case ep of Left e -> putStrLn $ "JSON parse error: " ++ show e
-                     Right p -> let tph = genTph p in
-                                writeFile "./out.tph" (unpack tph)
+--main2 :: IO ()
+main = do args <- getArgs
+          case args of [a1, a2] -> fdo a1 a2
+                       _ -> error "Usage: trapgen <input path> <output path>"
+
+  where fdo fin fout = do ep <- readParameters fin
+                          case ep of Left e -> putStrLn $ "JSON parse error: " ++ show e
+                                     Right p -> let tph = genTph p in
+                                                writeFile fout (unpack tph)
+
 
 
 genTph :: Parameters -> Text
@@ -35,7 +42,7 @@ genTph (Parameters ars) = mconcat $ processArea <$> ars
                 "    INT_VAR " <> verts <> "\n" <>
                 "    STR_VAR trap_script = ~" <> script <> "~\n" <>
                 "END\n\n"
-              where verts = case tgeo of GeometryPoints pts -> intercalate "\n            " $ renderCoord <$> zip [1..] pts
+              where verts = case tgeo of GeometryPoints pts -> intercalate "\n            " $ renderCoord <$> zip [0..] pts
 
                     script = case teff of EffectFixed s -> s
 
@@ -43,7 +50,7 @@ genTph (Parameters ars) = mconcat $ processArea <$> ars
                 
                     renderCoord :: (Int, Coord) -> Text
                     renderCoord (i, (Point x y)) = "x"<> i' <> " = " <> x' <> " y" <> i' <> " = " <> y'
-                      where i' = tx (i - 1)
+                      where i' = tx i
                             x' = tx $ solveNumber x
                             y' = tx $ solveNumber y
 
