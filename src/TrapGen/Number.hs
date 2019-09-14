@@ -6,11 +6,12 @@ import Data.Aeson ( withText
                   )
 
 import Data.Text (unpack)
+import Control.Monad.Trans.State.Strict (State, state)
+import System.Random (RandomGen, randomR)
 
--- TODO: switch Read to megaparsec later
-
-import Text.ParserCombinators.ReadPrec
-import Text.Read
+-- TODO: switch Read to attoparsec later
+import Text.ParserCombinators.ReadPrec (ReadPrec, (<++))
+import Text.Read (readPrec, readEither, get)
 
 
 data Number = Strict Int
@@ -19,17 +20,10 @@ data Number = Strict Int
             deriving (Show, Eq)
 
 
-getRange :: Number -> (Int, Int)
-getRange (Strict x) = (x, x)
-getRange (Range m n) = (m, n)
-getRange (Delta x dx) = (x - dx, x + dx)
-
-
-solveNumber :: Number -> Int
-solveNumber (Strict x) = x
-solveNumber (Range m n) = error "Not implemented"
-solveNumber (Delta x dx) = error "Not implemented"
-
+genNumber :: RandomGen g => Number -> State g Int
+genNumber (Strict x)   = return x
+genNumber (Range m n)  = state $ randomR (m, n) 
+genNumber (Delta x dx) = state $ randomR (x - dx, x + dx)
 
 
 readStrict :: ReadPrec Number

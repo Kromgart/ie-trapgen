@@ -41,6 +41,40 @@
                     ]
                 }
             ]
+        },
+
+        {
+            "id":"AR2603",
+            "groups":[
+                {
+                    "id":"1",
+                    "use":"all",
+                    "traps":[
+                        {
+                            "id":"1",
+                            "detect":"20",
+                            "disarm":"30",
+                            "effect":{
+                                "type":"fixed",
+                                "script":"GTAR4"
+                            },
+                            "geometry": {
+                                "type": "points",
+                                "points": [
+                                    "70-7000,77",
+                                    "47,42",
+                                    "69,48",
+                                    "89,1000~900"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
         }
+
+
+
+
     ]
 }
