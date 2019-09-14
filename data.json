@@ -25,11 +25,11 @@
             "id":"AR2602",
             "groups":[
                 {
-                    "id":"1",
+                    "id":"group1",
                     "use":"all",
                     "traps":[
                         {
-                            "id":"1",
+                            "id":"teleport",
                             "detect":"20~5",
                             "disarm":"30-35",
                             "effect":{
@@ -55,7 +55,7 @@
             "id":"AR2603",
             "groups":[
                 {
-                    "id":"1",
+                    "id":"initial",
                     "use":"all",
                     "traps":[
                         {

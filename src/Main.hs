@@ -11,6 +11,7 @@ import Control.Monad.Trans.State.Strict
 import Data.Foldable (find)
 import Data.Monoid ((<>))
 import Data.Text (Text, pack, unpack, intercalate)
+import qualified Data.Text as T
 
 import System.Environment (getArgs)
 import System.IO (writeFile)
@@ -45,22 +46,23 @@ genTph (Parameters efs ars) = do txt <- mconcat <$> mapM genArea ars
         genArea (Area (TextId a_id) grps) = do txt <- mconcat <$> mapM genGroup grps
                                                return $ "COPY_EXISTING ~" <> a_id <> ".ARE~ ~override/" <> a_id <> ".ARE~\n\n" <> txt
 
-
         genGroup :: TrapGroup -> State g Text
         genGroup (TrapGroup (TextId gid) trps) = do txt <- mconcat <$> mapM genTrap trps
                                                     return $ "// GROUP " <> gid <> ":\n\n" <> txt
 
-
-        genTrap :: Trap -> State g Text
-        genTrap t = do verts <- genVerts (trap_geometry t)
-                       script <- genScript (trap_effect t)
-                       detect <- genNum (trap_detect t)
-                       disarm <- genNum (trap_disarm t)
-                       return $  "LPF add_are_trap" <> 
-                                 nest1 <> "INT_VAR trap_detect = " <> detect <> " trap_disarm = " <> disarm <> 
-                                 nest2 <> verts <>
-                                 nest1 <> "STR_VAR trap_script = ~" <> script <> "~\n" <>
-                                 "END\n\n"
+          where genTrap :: Trap -> State g Text
+                genTrap t = do verts <- genVerts (trap_geometry t)
+                               script <- genScript (trap_effect t)
+                               detect <- genNum (trap_detect t)
+                               disarm <- genNum (trap_disarm t)
+                               let (TextId trapid) = trap_id t
+                               let prefix = T.take 31 $ T.concat ["trapgen_", gid, "_", trapid]
+                               return $ T.concat [ "LPF add_are_trap"
+                                                 , nest1, "INT_VAR trap_detect = ", detect, " trap_disarm = ", disarm
+                                                 , nest2, verts
+                                                 , nest1, "STR_VAR trap_script = ~", script, "~ trap_name = ~", prefix, "~\n"
+                                                 , "END\n\n"
+                                                 ]
 
         genVerts :: TrapGeometry -> State g Text
         genVerts (GeometryPoints pts) = intercalate nest2 <$> mapM genCoord (zip [0..] pts)
@@ -69,7 +71,7 @@ genTph (Parameters efs ars) = do txt <- mconcat <$> mapM genArea ars
         genCoord (i, (Point x y)) = do x' <- genNum x 
                                        y' <- genNum y
                                        let i' = tx i
-                                       return $ "x" <> i' <> " = " <> x' <> " y" <> i' <> " = " <> y'
+                                       return $ T.concat ["x", i', " = ", x', " y", i', " = ", y']
 
         genScript :: TrapEffect -> State g Text
         genScript (EffectFixed s) = return s
