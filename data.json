@@ -3,11 +3,19 @@
         {
             "flavor": "common",
             "tiers": [
-                { "id": "1",
+                { "id": "arrows",
                   "scripts" : [
-                    "GTAR"
+                    "GTAR",
+                    "GTAR3"
+                  ]
+                },
+                { "id": "spells",
+                  "scripts" : [
+                    "MMISS1",
+                    "CHORB"
                   ]
                 }
+
             ]
         }
     ],
@@ -55,8 +63,9 @@
                             "detect":"20",
                             "disarm":"30",
                             "effect":{
-                                "type":"fixed",
-                                "script":"GTAR4"
+                                "type":"random",
+                                "flavor_id":"common",
+                                "tier_id":"spells"
                             },
                             "geometry": {
                                 "type": "points",
