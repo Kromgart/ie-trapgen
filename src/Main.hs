@@ -8,7 +8,7 @@ import TrapGen.Number
 import TrapGen.InputDefinitions
 
 import Control.Monad.Trans.State.Strict
-import Data.Foldable (find)
+import Data.Foldable (find, foldl')
 import Data.Monoid ((<>))
 import Data.Text (Text, pack, unpack, intercalate)
 import qualified Data.Text as T
@@ -47,8 +47,9 @@ genTph (Parameters efs ars) = do txt <- mconcat <$> mapM genArea ars
                                                return $ "COPY_EXISTING ~" <> a_id <> ".ARE~ ~override/" <> a_id <> ".ARE~\n\n" <> txt
 
         genGroup :: TrapGroup -> State g Text
-        genGroup (TrapGroup (TextId gid) trps) = do txt <- mconcat <$> mapM genTrap trps
-                                                    return $ "// GROUP " <> gid <> ":\n\n" <> txt
+        genGroup (TrapGroup (TextId gid) tps pick) = do picked <- pickTraps
+                                                        txt <- mconcat <$> mapM genTrap picked
+                                                        return $ "// GROUP " <> gid <> ":\n\n" <> txt
 
           where genTrap :: Trap -> State g Text
                 genTrap t = do verts <- genVerts (trap_geometry t)
@@ -63,6 +64,16 @@ genTph (Parameters efs ars) = do txt <- mconcat <$> mapM genArea ars
                                                  , nest1, "STR_VAR trap_script = ~", script, "~ trap_name = ~", prefix, "~\n"
                                                  , "END\n\n"
                                                  ]
+                pickTraps :: State g [Trap]
+                pickTraps = 
+                  case pick of Nothing -> return tps
+                               Just n' -> do n <- genNumber n'
+                                             let ltps = length tps
+                                             if (n >= ltps) then return tps
+                                             else if (n <= 0) then return []
+                                             else do idx <- mapM (\i -> genNumber $ Range 0 (i - 1)) [ltps, (ltps - 1) .. n + 1]
+                                                     return $ foldl' (\xs d -> kickItem d xs) tps idx
+
 
         genVerts :: TrapGeometry -> State g Text
         genVerts (GeometryPoints pts) = intercalate nest2 <$> mapM genCoord (zip [0..] pts)
@@ -89,6 +100,14 @@ genTph (Parameters efs ars) = do txt <- mconcat <$> mapM genArea ars
 
         genNum :: Number -> State g Text
         genNum = fmap tx . genNumber
+
+
+kickItem :: Int -> [a] -> [a]
+kickItem _ [] = []
+kickItem 0 (_ : ls) = ls
+kickItem i ls = let (xs, ys) = splitAt i ls in
+                case ys of (_ : zs) -> xs ++ zs
+                           _ -> xs ++ ys
 
 
 

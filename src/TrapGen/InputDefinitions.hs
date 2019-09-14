@@ -7,6 +7,7 @@ import Data.Aeson ( withObject
                   , FromJSON
                   , parseJSON
                   , (.:)
+                  , (.:?)
                   , eitherDecode
                   )
 
@@ -78,6 +79,7 @@ instance FromJSON Trap where
 
 data TrapGroup = TrapGroup { group_id :: TextId TrapGroup
                            , group_traps :: [Trap]
+                           , group_pick :: Maybe Number
                            }
                            deriving Show
 
@@ -85,6 +87,7 @@ data TrapGroup = TrapGroup { group_id :: TextId TrapGroup
 instance FromJSON TrapGroup where
     parseJSON = withObject "TrapGroup" $ \v -> TrapGroup <$> v .: "id"
                                                          <*> v .: "traps"
+                                                         <*> v .:? "pick"
 
 
 data Area = Area { area_id :: TextId Area

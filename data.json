@@ -26,7 +26,6 @@
             "groups":[
                 {
                     "id":"group1",
-                    "use":"all",
                     "traps":[
                         {
                             "id":"teleport",
@@ -56,7 +55,7 @@
             "groups":[
                 {
                     "id":"initial",
-                    "use":"all",
+                    "pick":"1-3",
                     "traps":[
                         {
                             "id":"1",
@@ -76,7 +75,44 @@
                                     "89,1000~900"
                                 ]
                             }
+                        },
+                        {
+                            "id":"2",
+                            "detect":"20",
+                            "disarm":"30",
+                            "effect":{
+                                "type":"fixed",
+                                "script":"HORROR"
+                            },
+                            "geometry": {
+                                "type": "points",
+                                "points": [
+                                    "70-90,77",
+                                    "47,42",
+                                    "69,48",
+                                    "89,1000~90"
+                                ]
+                            }
+                        },
+                        {
+                            "id":"3",
+                            "detect":"20",
+                            "disarm":"30",
+                            "effect":{
+                                "type":"fixed",
+                                "script":"HOLD"
+                            },
+                            "geometry": {
+                                "type": "points",
+                                "points": [
+                                    "70-90,77",
+                                    "47,42",
+                                    "69,48",
+                                    "89,1000~90"
+                                ]
+                            }
                         }
+ 
                     ]
                 }
             ]
