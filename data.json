@@ -37,8 +37,8 @@
                             },
                             "geometry": {
                                 "type": "rectangle",
-                                "center": "300~10,300~5",
-                                "width": "100",
+                                "center": "300,300~5",
+                                "width": "100-101",
                                 "height": "60",
                                 "angle": "45"
                             },

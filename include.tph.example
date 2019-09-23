@@ -1,0 +1,102 @@
+/*
+DEFINE_PATCH_FUNCTION ensure_3verts
+BEGIN
+    PATCH_IF NOT (VARIABLE_IS_SET x0 AND VARIABLE_IS_SET y0 AND 
+                  VARIABLE_IS_SET x1 AND VARIABLE_IS_SET y1 AND 
+                  VARIABLE_IS_SET x2 AND VARIABLE_IS_SET y2)
+    THEN BEGIN PATCH_FAIL "ensure_3verts: failed. The calling scope must have the following variables: x0, y0, x1, y1, x2 and y2" END
+END*/
+
+// Accepts multiple integer arguments [x0, x1, ...., x(n-1))
+// x0 is required
+DEFINE_PATCH_FUNCTION min_int RET m
+BEGIN
+    PATCH_IF (NOT VARIABLE_IS_SET prefix) THEN BEGIN PATCH_FAIL "min_int: missing argument 'prefix'" END
+    PATCH_IF (NOT VARIABLE_IS_SET EVAL ~%prefix%0~) THEN BEGIN PATCH_FAIL "min_int: at least the first argument is required (%prefix%0)" END
+    m = EVAL ~%prefix%0~
+    FOR(i = 1 ; VARIABLE_IS_SET EVAL ~%prefix%%i%~ ; ++i ) BEGIN
+        SET xi = EVAL ~%prefix%%i%~
+        PATCH_IF xi < m THEN BEGIN m = xi END
+    END
+END
+
+
+// Accepts multiple integer arguments [x0, x1, ...., x(n-1))
+// x0 is required
+DEFINE_PATCH_FUNCTION max_int RET m
+BEGIN
+    PATCH_IF (NOT VARIABLE_IS_SET prefix) THEN BEGIN PATCH_FAIL "max_int: missing argument 'prefix'" END
+    PATCH_IF (NOT VARIABLE_IS_SET EVAL ~%prefix%0~) THEN BEGIN PATCH_FAIL "max_int: at least the first argument is required (%prefix%0)" END
+    m = EVAL ~%prefix%0~
+    FOR(i = 1 ; VARIABLE_IS_SET EVAL ~%prefix%%i%~ ; ++i ) BEGIN
+        SET xi = EVAL ~%prefix%%i%~
+        PATCH_IF xi > m THEN BEGIN m = xi END
+    END
+END
+
+// Takes from the current scope existing variables x0,x1,... and y0,y1... and sets corresponding (fj_vertex_i = xi + (yi << 16))
+DEFINE_PATCH_MACRO set_fj_vertices
+BEGIN
+    FOR(i = 0 ; (VARIABLE_IS_SET EVAL ~x%i%~) AND (VARIABLE_IS_SET EVAL ~y%i%~) ; ++i ) BEGIN
+        SET q = (EVAL ~x%i%~) + (EVAL ~y%i%~ << 16)
+        // PATCH_PRINT ~SET fj_vertex_%i% = %q%~
+        SET EVAL ~fj_vertex_%i%~ = q
+    END
+END
+
+
+DEFINE_PATCH_FUNCTION add_are_trap
+    INT_VAR trap_flags = 0b1000 // detectable
+            trap_detect = 1
+            trap_disarm = 1
+            trap_shoot_x = 0
+            trap_shoot_y = 0
+    STR_VAR trap_name = "Trap (rnd-tweaks)"
+            trap_script = ""
+RET trap_index
+BEGIN
+    PATCH_IF ~%SOURCE_EXT%~ STRING_EQUAL_CASE ~ARE~ THEN BEGIN
+    
+        PATCH_IF ("%trap_script%" STRING_EQUAL "") THEN BEGIN PATCH_FAIL "Error in add_are_trap: trap script not specified" END
+        
+        PATCH_IF NOT (VARIABLE_IS_SET x0 AND VARIABLE_IS_SET y0 AND 
+                      VARIABLE_IS_SET x1 AND VARIABLE_IS_SET y1 AND 
+                      VARIABLE_IS_SET x2 AND VARIABLE_IS_SET y2)
+        THEN BEGIN PATCH_FAIL "Error in add_are_trap. The caller must provide variables for at least 3 trap vertices: x0, y0, x1, y1, x2, y2" END
+       
+        LPF min_int STR_VAR prefix = "x" RET left = m END
+        LPF min_int STR_VAR prefix = "y" RET top = m END
+        LPF max_int STR_VAR prefix = "x" RET right = m END
+        LPF max_int STR_VAR prefix = "y" RET bottom = m END
+        
+        PATCH_IF trap_shoot_x == 0 AND trap_shoot_y == 0 THEN BEGIN
+            trap_shoot_x = (left + right) / 2
+            trap_shoot_y = (top + bottom) / 2
+        END
+    
+        LPM set_fj_vertices
+        
+        LPF fj_are_structure
+            INT_VAR fj_type = 0 // trap
+                    fj_box_left   = left
+                    fj_box_top    = top
+                    fj_box_right  = right
+                    fj_box_bottom = bottom
+                    fj_flags = trap_flags
+                    fj_trap_detect = trap_detect
+                    fj_trap_remove = trap_disarm
+                    fj_trap_active = 1
+                    fj_trap_status = 0 // not detected
+                    fj_loc_x = trap_shoot_x
+                    fj_loc_y = trap_shoot_y
+                    
+            STR_VAR fj_structure_type = "region"
+                    fj_reg_script = EVAL "%trap_script%"
+                    fj_name = EVAL "%trap_name%"
+                    
+            RET trap_index = fj_return_offset
+        END                 
+        
+    END ELSE PATCH_FAIL "Function add_are_trap: called not on the ARE file, but on %SOURCE_FILE%"
+END
+
