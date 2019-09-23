@@ -25,6 +25,21 @@ instance Functor Point where
     fmap f (Point x y) = Point (f x) (f y)
 
 
+instance Applicative Point where
+    pure x = Point x x
+    (Point f g) <*> (Point x y) = Point (f x) (g y)
+
+
+instance Foldable Point where
+    foldMap fm (Point x y) = fm x <> fm y
+    foldr f acc (Point x y) = f x $ f y acc
+
+
+instance Traversable Point where
+    traverse f (Point x y) = Point <$> f x <*> f y
+    sequenceA (Point ax ay) = Point <$> ax <*> ay
+
+
 instance Read a => Read (Point a) where
    readPrec = do x <- readPrec
                  c <- get

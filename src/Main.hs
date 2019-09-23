@@ -122,12 +122,10 @@ genTph (Parameters efs ars) = do txt <- mconcat <$> mapM genArea ars
         genNumber' = fmap tx . genNumber
 
         genPoint :: Point Number -> State g (Point Int)
-        genPoint (Point x y) = do x' <- genNumber x
-                                  y' <- genNumber y
-                                  return (Point x' y')
+        genPoint = traverse genNumber
 
         genPoint' :: Point Number -> State g (Point Text)
-        genPoint' pt = genPoint pt >>= return . fmap tx
+        genPoint' pt = fmap tx <$> genPoint pt
 
 
 kickItem :: Int -> [a] -> [a]
