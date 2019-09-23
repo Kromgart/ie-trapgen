@@ -8,7 +8,7 @@ import Data.Aeson ( withText
 
 import Data.Text (unpack)
 
--- TODO: switch to megaparsec later
+-- TODO: switch to attoparsec later
 
 import Text.ParserCombinators.ReadPrec
 import Text.Read

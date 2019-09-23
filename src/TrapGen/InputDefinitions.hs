@@ -18,10 +18,8 @@ import System.IO (FilePath)
 
 
 import TrapGen.Number
-import TrapGen.Point
+import TrapGen.Geometry
 
-
-type Coord = Point Number
 
 
 newtype TextId a = TextId Text
@@ -46,18 +44,9 @@ instance FromJSON TrapEffect where
                                                              "random" -> EffectRandom <$> v .: "flavor_id"
                                                                                       <*> v .: "tier_id"
 
-                                                             u -> fail $ "Unknown TrapEffect type " ++ u
+                                                             u -> fail $ "Unknown TrapEffect type '" ++ u ++ "'"
 
 
-
-data TrapGeometry = GeometryPoints [Coord]
-                    deriving Show
-
-
-instance FromJSON TrapGeometry where
-    parseJSON = withObject "TrapGeometry" $ \v -> do t <- v .: "type"
-                                                     case t of "points" -> GeometryPoints <$> v .: "points"
-                                                               u -> fail $ "Unknown TrapGeometry type " ++ u
 
 data Trap = Trap { trap_id :: TextId Trap
                  , trap_detect :: Number

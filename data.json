@@ -36,14 +36,25 @@
                                 "script":"GTAR"
                             },
                             "geometry": {
-                                "type": "points",
-                                "points": [
-                                    "470,277",
-                                    "447,342",
-                                    "469,348",
-                                    "489,285"
-                                ]
-                            }
+                                "type": "rectangle",
+                                "center": "300~10,300~5",
+                                "width": "100",
+                                "height": "60",
+                                "angle": "45"
+                            },
+                            "transform_not_implemented": [
+                                {
+                                    "type": "offset",
+                                    "x_angle": "30",
+                                    "offset": "0~100,0"
+                                },
+                                {
+                                    "type": "rotation",
+                                    "angle": "45"
+                                }
+                            ]
+                                
+                            
                         }
                     ]
                 }

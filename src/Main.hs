@@ -5,13 +5,17 @@ module Main where
 
 import TrapGen.Point
 import TrapGen.Number
+import TrapGen.Geometry
 import TrapGen.InputDefinitions
 
+
 import Control.Monad.Trans.State.Strict
+
 import Data.Foldable (find, foldl')
 import Data.Monoid ((<>))
 import Data.Text (Text, pack, unpack, intercalate)
 import qualified Data.Text as T
+
 
 import System.Environment (getArgs)
 import System.IO (writeFile)
@@ -44,7 +48,7 @@ genTph (Parameters efs ars) = do txt <- mconcat <$> mapM genArea ars
        
         genArea :: Area -> State g Text
         genArea (Area (TextId a_id) grps) = do txt <- mconcat <$> mapM genGroup grps
-                                               return $ "COPY_EXISTING ~" <> a_id <> ".ARE~ ~override/" <> a_id <> ".ARE~\n\n" <> txt
+                                               return $ T.concat ["COPY_EXISTING ~", a_id, ".ARE~ ~override/", a_id, ".ARE~\n\n", txt]
 
         genGroup :: TrapGroup -> State g Text
         genGroup (TrapGroup (TextId gid) tps pick) = do picked <- pickTraps
@@ -54,8 +58,8 @@ genTph (Parameters efs ars) = do txt <- mconcat <$> mapM genArea ars
           where genTrap :: Trap -> State g Text
                 genTrap t = do verts <- genVerts (trap_geometry t)
                                script <- genScript (trap_effect t)
-                               detect <- genNum (trap_detect t)
-                               disarm <- genNum (trap_disarm t)
+                               detect <- genNumber' (trap_detect t)
+                               disarm <- genNumber' (trap_disarm t)
                                let (TextId trapid) = trap_id t
                                let prefix = T.take 31 $ T.concat ["trapgen_", gid, "_", trapid]
                                return $ T.concat [ "LPF add_are_trap"
@@ -77,12 +81,28 @@ genTph (Parameters efs ars) = do txt <- mconcat <$> mapM genArea ars
 
         genVerts :: TrapGeometry -> State g Text
         genVerts (GeometryPoints pts) = intercalate nest2 <$> mapM genCoord (zip [0..] pts)
+        genVerts (GeometryRect (Rectangle c w h a)) = do (Point cx cy) <- genPoint c
+                                                         (w1, w2) <- (`divMod` 2) <$> genNumber w
+                                                         (h1, h2) <- (`divMod` 2) <$> genNumber h
+                                                         a' <- genNumber a
+                                                         let x1 = tx $ cx - w1
+                                                             y1 = tx $ cy - h1
+                                                             x2 = tx $ cx + w1 + w2
+                                                             y2 = tx $ cy + h1 + h2
+                                                         return $ T.concat [ "x0 = ", x1, " y0 = ", y1, nest2
+                                                                           , "x1 = ", x2, " y1 = ", y1, nest2
+                                                                           , "x2 = ", x2, " y2 = ", y2, nest2
+                                                                           , "x3 = ", x1, " y3 = ", y2
+                                                                           ]    
+
+
+
 
         genCoord :: (Int, Coord) -> State g Text
-        genCoord (i, (Point x y)) = do x' <- genNum x 
-                                       y' <- genNum y
-                                       let i' = tx i
-                                       return $ T.concat ["x", i', " = ", x', " y", i', " = ", y']
+        genCoord (i, pt) = do (Point x' y') <- genPoint' pt
+                              let i' = tx i
+                              return $ T.concat ["x", i', " = ", x', " y", i', " = ", y']
+
 
         genScript :: TrapEffect -> State g Text
         genScript (EffectFixed s) = return s
@@ -98,8 +118,16 @@ genTph (Parameters efs ars) = do txt <- mconcat <$> mapM genArea ars
 
         tx = pack . show
 
-        genNum :: Number -> State g Text
-        genNum = fmap tx . genNumber
+        genNumber' :: Number -> State g Text
+        genNumber' = fmap tx . genNumber
+
+        genPoint :: Point Number -> State g (Point Int)
+        genPoint (Point x y) = do x' <- genNumber x
+                                  y' <- genNumber y
+                                  return (Point x' y')
+
+        genPoint' :: Point Number -> State g (Point Text)
+        genPoint' pt = genPoint pt >>= return . fmap tx
 
 
 kickItem :: Int -> [a] -> [a]
@@ -107,7 +135,7 @@ kickItem _ [] = []
 kickItem 0 (_ : ls) = ls
 kickItem i ls = let (xs, ys) = splitAt i ls in
                 case ys of (_ : zs) -> xs ++ zs
-                           _ -> xs ++ ys
+                           [] -> xs
 
 
 
