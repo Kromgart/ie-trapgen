@@ -21,6 +21,14 @@ instance Show a => Show (Point a) where
     show (Point x y) = "(" ++ show x ++ "," ++ show y ++ ")"
 
 
+instance Semigroup a => Semigroup (Point a) where
+    (Point x1 y1) <> (Point x2 y2) = Point (x1 <> x2) (y1 <> y2)
+
+
+instance Monoid a => Monoid (Point a) where
+    mempty = Point mempty mempty
+
+
 instance Functor Point where
     fmap f (Point x y) = Point (f x) (f y)
 

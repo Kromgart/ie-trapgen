@@ -80,28 +80,27 @@ genTph (Parameters efs ars) = do txt <- mconcat <$> mapM genArea ars
 
 
         genVerts :: TrapGeometry -> State g Text
-        genVerts (GeometryPoints pts) = intercalate nest2 <$> mapM genCoord (zip [0..] pts)
-        genVerts (GeometryRect (Rectangle c w h a)) = do (Point cx cy) <- genPoint c
-                                                         (w1, w2) <- (`divMod` 2) <$> genNumber w
-                                                         (h1, h2) <- (`divMod` 2) <$> genNumber h
-                                                         a' <- genNumber a
-                                                         let x1 = tx $ cx - w1
-                                                             y1 = tx $ cy - h1
-                                                             x2 = tx $ cx + w1 + w2
-                                                             y2 = tx $ cy + h1 + h2
-                                                         return $ T.concat [ "x0 = ", x1, " y0 = ", y1, nest2
-                                                                           , "x1 = ", x2, " y1 = ", y1, nest2
-                                                                           , "x2 = ", x2, " y2 = ", y2, nest2
-                                                                           , "x3 = ", x1, " y3 = ", y2
-                                                                           ]    
 
+        genVerts (GeometryPoints pts) = intercalate nest2 <$> mapM (uncurry genCoord) (zip [0..] pts)
+        genVerts (GeometryRect (Rectangle c w h a)) = 
+          do c' <- genPoint c
+             (w1, w2) <- (`divMod` 2) <$> genNumber w
+             (h1, h2) <- (`divMod` 2) <$> genNumber h
+             a' <- ((* pi) . (/ 180) . fromIntegral)  <$> genNumber a
+             let left    = 0 - w1
+                 top     = 0 - h1
+                 right   = 0 + w1 + w2
+                 bottom  = 0 + h1 + h2
 
+                 move = offset c' . rotate a'
 
+                 pts = move <$> [ Point left top
+                                , Point right top
+                                , Point right bottom
+                                , Point left bottom
+                                ]
 
-        genCoord :: (Int, Coord) -> State g Text
-        genCoord (i, pt) = do (Point x' y') <- genPoint' pt
-                              let i' = tx i
-                              return $ T.concat ["x", i', " = ", x', " y", i', " = ", y']
+             return $ intercalate nest2 $ uncurry renderCoord <$> zip [0..] pts
 
 
         genScript :: TrapEffect -> State g Text
@@ -116,16 +115,42 @@ genTph (Parameters efs ars) = do txt <- mconcat <$> mapM genArea ars
                                              return $ ss !! i
 
 
-        tx = pack . show
+        genPoint :: Point Number -> State g (Point Int)
+        genPoint = traverse genNumber
+
 
         genNumber' :: Number -> State g Text
         genNumber' = fmap tx . genNumber
 
-        genPoint :: Point Number -> State g (Point Int)
-        genPoint = traverse genNumber
 
-        genPoint' :: Point Number -> State g (Point Text)
-        genPoint' pt = fmap tx <$> genPoint pt
+        genCoord :: Int -> Coord -> State g Text
+        genCoord i pt = renderCoord i <$> genPoint pt
+
+
+
+
+tx :: Show a => a -> Text
+tx = pack . show
+
+
+renderCoord :: Int -> Point Int -> Text
+renderCoord i pt = let i' = tx i 
+                       (Point x' y') = tx <$> pt
+                   in T.concat ["x", i', " = ", x', " y", i', " = ", y']
+
+
+rotate :: Double -> Point Int -> Point Int
+rotate a (Point x y) = let sina = sin a
+                           cosa = cos a
+                           x' = fromIntegral x
+                           y' = fromIntegral y
+                           xi = round $ x' * cosa - y' * sina
+                           yi = round $ x' * sina + y' * cosa
+                       in Point xi yi
+
+
+offset :: Point Int -> Point Int -> Point Int
+offset (Point x1 y1) (Point x2 y2) = Point (x1 + x2) (y1 + y2)
 
 
 kickItem :: Int -> [a] -> [a]
