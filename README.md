@@ -29,11 +29,11 @@ The following value types are used, when describing the JSON structure below:
 - POINT   - pair of RANDOM values, separated by comma ("200,400-450")
 
 
-Most integer values support randomization (unless the value type is INTEGER) and can be written in 3 forms:
+Most integral values are of type RANDOM and can be written in 3 forms:
 
 1. Strict number. This works as a normal precise integer ("detect": "30"). No randomization is applied.
 2. Range. Two integers (min and max) separated by '-' ("detect": "20-40"). A random number from the specified range is used.
-3. Delta. Two ingerers (base and delta) separated by '\~' ("disarm": "60\~10"). A random number is generated in a range from (base - delta) to (base + delta). 60~10 represents a range from 50 to 70.
+3. Delta. Two integers (base and delta) separated by '\~' ("width": "160\~12"). A random number is generated in a range from (base - delta) to (base + delta). 160~12 represents a range from 148 to 172.
 
 ### Input file structure
 
