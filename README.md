@@ -37,7 +37,7 @@ Most integer values support randomization (unless the value type is INTEGER) and
 
 ### Input file structure
 
-See data.json for reference
+See [data.json](./data.json) for reference.
 
 
 **/(JSON root object):**
@@ -77,6 +77,7 @@ See data.json for reference
 {
   "id": "bridge",   // STRING: name of this group
   "pick":"1-3",     // RANDOM: amount of traps to pick from the "traps" array
+                    // Optional: if missing then all traps from the "traps" array will be created
   "traps": []       // ARRAY: list of all possible traps in this group
 }
 ```
@@ -94,7 +95,7 @@ See data.json for reference
 
 /areas/\[area\]/\[trap group\]/\[trap\]/**effect**
 
-Fixed effect (no randomization, doesn't use effects data from **/random_effects/** )
+**Fixed effect** (no randomization, doesn't use effects data from **/random_effects/** )
 ```
 {
   "type":"fixed", // must be "fixed" for fixed effect
@@ -102,7 +103,7 @@ Fixed effect (no randomization, doesn't use effects data from **/random_effects/
 }
 ```
 
-Random effect. Randomly picks one effect from the specified flavor/tier combination under **/random_effects/** structure
+**Random effect**. Randomly picks one effect from the specified flavor/tier combination under **/random_effects/** structure
 ```
 {
   "type":"random",      // must be "random" for random effect
@@ -113,7 +114,7 @@ Random effect. Randomly picks one effect from the specified flavor/tier combinat
 
 /areas/\[area\]/\[trap group\]/\[trap\]/**geometry**
 
-Points geometry. Basically an array of POINTs (pairs of RANDOM values, see above).
+**Points geometry**. Basically an array of POINTs (pairs of RANDOM values, see above).
 ```
 {
     "type": "points", // must be "points" for this object type
@@ -127,9 +128,9 @@ Points geometry. Basically an array of POINTs (pairs of RANDOM values, see above
 ```
 
 
-Rectangle geometry. Defined by width, height, rotation angle, and center. 
+**Rectangle geometry**. Defined by width, height, rotation angle, and center. 
 
-A rectangle with defined width and height is created with center at\[0,0], rotated clockwise by the specified angle (in degrees), and offset to the specified new center point.
+A rectangle with defined width and height is created with center at \[0,0], rotated clockwise by the specified angle (in degrees), and offset to the specified new center point.
 ```
 {
   "type": "rectangle",    // must be "rectangle" for this object type
@@ -143,6 +144,6 @@ A rectangle with defined width and height is created with center at\[0,0], rotat
 
 ## Output
 
-Output file is a WeiDU script, that can be directly copy-pasted into your mod tp2 file, or automatically generated and used during mod installation (see **AT_NOW** command in WeiDU documentation). 
+Output file is a WeiDU script, that can be directly copy-pasted into your mod tp2 file, or automatically generated and used during mod installation (see **AT_NOW** command in WeiDU documentation). An example output is [provided](./output.tph.example)
 
-This generated script expects a certain patch function (**add_are_trap**) to be available during execution. A reference function is provided in this repository (see include.tph.example).
+This generated script expects a certain patch function (**add_are_trap**) to be available during execution. A reference function is [provided](./include.tph.example).
