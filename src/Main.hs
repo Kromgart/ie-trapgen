@@ -47,8 +47,11 @@ genTph (Parameters efs ars) = do txt <- mconcat <$> mapM genArea ars
 
        
         genArea :: Area -> State g Text
-        genArea (Area (TextId a_id) grps) = do txt <- mconcat <$> mapM genGroup grps
-                                               return $ T.concat ["COPY_EXISTING ~", a_id, ".ARE~ ~override/", a_id, ".ARE~\n\n", txt]
+        genArea (Area (TextId a_id) clr grps) = do txt <- mconcat <$> mapM genGroup grps
+                                                   return $ T.concat ["COPY_EXISTING ~", a_id, ".ARE~ ~override/", a_id, ".ARE~\n\n"
+                                                                     , if clr then "LPF delete_normal_traps END\n\n" else mempty
+                                                                     , txt
+                                                                     ]
 
         genGroup :: TrapGroup -> State g Text
         genGroup (TrapGroup (TextId gid) tps pick) = do picked <- pickTraps

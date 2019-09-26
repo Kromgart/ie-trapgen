@@ -24,6 +24,7 @@ The following value types are used, when describing the JSON structure below:
 - STRING - json string enclosed in double quotes ("some string")
 - ARRAY  - json array enclosed in square brackets. Elements are separated by commas. (array of strings - \[ "aaa", "bbb", "ccc"\])
 - OBJECT - json object enclosed in curly braces ({...}). All objects have a defined structure.
+- BOOL - json boolean (true or false)
 - INTEGER - precise (no randomization) integral number, enclosed in double quotes ("25")
 - RANDOM  - random integral number, enclosed in double quotes. See description below
 - POINT   - pair of RANDOM values, separated by comma ("200,400-450")
@@ -68,6 +69,8 @@ See [data.json](./data.json) for reference.
 ```
 {
   "id": "AR2602",   // STRING: area to modify
+  "clear": true,    // BOOL:  'true' to delete existing 'normal' traps from the area before adding anything.
+                    // Optional, default value is false.
   "groups": []      // ARRAY: list of trap groups
 }
 ```
@@ -146,4 +149,4 @@ A rectangle with defined width and height is created with center at \[0,0], rota
 
 Output file is a WeiDU script, that can be directly copy-pasted into your mod tp2 file, or automatically generated and used during mod installation (see **AT_NOW** command in WeiDU documentation). An example output is [provided](./output.tph.example)
 
-This generated script expects a certain patch function (**add_are_trap**) to be available during execution. A reference function is [provided](./include.tph.example).
+This generated script expects certain patch functions (**add_are_trap** and **delete_normal_traps**) to be available during execution. Reference functions are [provided](./include.tph.example).

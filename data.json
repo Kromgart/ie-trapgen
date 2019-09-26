@@ -3,17 +3,19 @@
         {
             "flavor": "common",
             "tiers": [
-                { "id": "arrows",
-                  "scripts" : [
-                    "GTAR",
-                    "GTAR3"
-                  ]
+                { 
+                    "id": "arrows",
+                    "scripts" : [
+                        "GTAR",
+                        "GTAR3"
+                    ]
                 },
-                { "id": "spells",
-                  "scripts" : [
-                    "MMISS1",
-                    "CHORB"
-                  ]
+                { 
+                    "id": "spells",
+                    "scripts" : [
+                        "MMISS1",
+                        "CHORB"
+                    ]
                 }
 
             ]
@@ -23,6 +25,7 @@
     "areas":[
         {
             "id":"AR2602",
+            "clear":true,
             "groups":[
                 {
                     "id":"group1",

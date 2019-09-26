@@ -8,6 +8,7 @@ import Data.Aeson ( withObject
                   , parseJSON
                   , (.:)
                   , (.:?)
+                  , (.!=)
                   , eitherDecode
                   )
 
@@ -48,10 +49,10 @@ instance FromJSON TrapEffect where
 
 
 
-data Trap = Trap { trap_id :: TextId Trap
-                 , trap_detect :: Number
-                 , trap_disarm :: Number
-                 , trap_effect :: TrapEffect
+data Trap = Trap { trap_id       :: TextId Trap
+                 , trap_detect   :: Number
+                 , trap_disarm   :: Number
+                 , trap_effect   :: TrapEffect
                  , trap_geometry :: TrapGeometry
                  }
                  deriving Show
@@ -66,9 +67,9 @@ instance FromJSON Trap where
 
 
 
-data TrapGroup = TrapGroup { group_id :: TextId TrapGroup
+data TrapGroup = TrapGroup { group_id    :: TextId TrapGroup
                            , group_traps :: [Trap]
-                           , group_pick :: Maybe Number
+                           , group_pick  :: Maybe Number
                            }
                            deriving Show
 
@@ -79,7 +80,8 @@ instance FromJSON TrapGroup where
                                                          <*> v .:? "pick"
 
 
-data Area = Area { area_id :: TextId Area
+data Area = Area { area_id     :: TextId Area
+                 , area_clear  :: Bool
                  , area_groups :: [TrapGroup]
                  }
                  deriving Show
@@ -87,10 +89,11 @@ data Area = Area { area_id :: TextId Area
 
 instance FromJSON Area where
     parseJSON = withObject "Area" $ \v -> Area <$> v .: "id"
+                                               <*> v .:? "clear" .!= False
                                                <*> v .: "groups"
 
 
-data EffectTier = EffectTier { tier_id :: TextId EffectTier
+data EffectTier = EffectTier { tier_id      :: TextId EffectTier
                              , tier_scripts :: [Text]
                              }
                              deriving Show
@@ -101,7 +104,7 @@ instance FromJSON EffectTier where
                                                      <*> v .: "scripts"
 
 
-data EffectFlavor = EffectFlavor { flavor_id :: TextId EffectFlavor
+data EffectFlavor = EffectFlavor { flavor_id    :: TextId EffectFlavor
                                  , flavor_tiers :: [EffectTier]
                                  }
                                  deriving Show

@@ -1,11 +1,3 @@
-/*
-DEFINE_PATCH_FUNCTION ensure_3verts
-BEGIN
-    PATCH_IF NOT (VARIABLE_IS_SET x0 AND VARIABLE_IS_SET y0 AND 
-                  VARIABLE_IS_SET x1 AND VARIABLE_IS_SET y1 AND 
-                  VARIABLE_IS_SET x2 AND VARIABLE_IS_SET y2)
-    THEN BEGIN PATCH_FAIL "ensure_3verts: failed. The calling scope must have the following variables: x0, y0, x1, y1, x2 and y2" END
-END*/
 
 // Accepts multiple integer arguments [x0, x1, ...., x(n-1))
 // x0 is required
@@ -99,4 +91,44 @@ BEGIN
         
     END ELSE PATCH_FAIL "Function add_are_trap: called not on the ARE file, but on %SOURCE_FILE%"
 END
+
+
+
+DEFINE_PATCH_FUNCTION delete_normal_traps
+BEGIN
+    PATCH_IF ~%SOURCE_EXT%~ STRING_EQUAL_CASE ~ARE~ THEN BEGIN
+    
+        PATCH_LOG "delete_normal_traps: called on %SOURCE_FILE%"
+    
+        SET reg_ofs = LONG_AT 0x5c
+        FOR (i = (SHORT_AT 0x5a) - 1 ; i >= 0 ; --i) BEGIN
+        
+            SET reg_i = reg_ofs + (i * 0xC4)
+            
+            READ_ASCII reg_i reg_name (0x20)
+            
+            SET is_trigger    = (SHORT_AT (reg_i + 0x20) == 0)
+            SET is_detectable = (LONG_AT (reg_i + 0x60) & 0b1000)
+            SET detection     = SHORT_AT (reg_i + 0x68)
+            SET disarming     = SHORT_AT (reg_i + 0x6a)
+            SET is_trapped    = SHORT_AT (reg_i + 0x6c)
+            
+            PATCH_IF (is_trigger AND is_detectable AND is_trapped AND detection < 100 AND disarming < 100) THEN BEGIN
+                
+                PATCH_LOG "Deleting %reg_name%: %is_trigger%, %is_detectable%, %is_trapped%, %detection%, %disarming%"
+                
+                LPF fj_are_structure
+                    INT_VAR fj_delete_mode = i
+                    STR_VAR fj_structure_type = "region"
+                END
+            
+            END ELSE PATCH_LOG "Skipping %reg_name%: %is_trigger%, %is_detectable%, %is_trapped%, %detection%, %disarming%"
+            
+            
+        END
+        
+    END ELSE PATCH_FAIL "Function add_are_trap: called not on the ARE file, but on %SOURCE_FILE%"
+END
+
+
 
