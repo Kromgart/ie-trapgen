@@ -133,13 +133,15 @@ See [data.json](./data.json) for reference.
 
 **Rectangle geometry**. Defined by width, height, rotation angle, and center. 
 
-A rectangle with defined width and height is created with center at \[0,0], rotated clockwise by the specified angle (in degrees), and offset to the specified new center point.
+A rectangle with defined width and height is created with center at \[0,0], rotated clockwise by the specified angle (in degrees), scaled by Y-axis by ('tilt' / 10) and offset to the specified new center point.
 ```
 {
   "type": "rectangle",    // must be "rectangle" for this object type
   "width": "100-110",     // RANDOM: rectangle width before rotation is applied
   "height": "60",         // RANDOM: rectangle height before rotation is applied
   "angle": "45",          // RANDOM: rotation angle (degrees, clockwise) before offset to the new center
+  "tilt": "8",            // RANDOM: tilt factor to compensate for isometry distortion.
+                          // Optional. Default value = 9.
   "center": "300~20,415~20"   // POINT: final center point of the rectangle
 }
 ```

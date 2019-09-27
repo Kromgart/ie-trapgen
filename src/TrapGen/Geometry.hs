@@ -7,6 +7,8 @@ import Data.Aeson ( withObject
                   , FromJSON
                   , parseJSON
                   , (.:)
+                  , (.:?)
+                  , (.!=)
                   )
 
 
@@ -21,6 +23,7 @@ data Rectangle = Rectangle { center :: Coord
                            , width  :: Number
                            , height :: Number
                            , angle  :: Number
+                           , tilt   :: Number
                            }
                            deriving Show
 
@@ -37,6 +40,7 @@ instance FromJSON TrapGeometry where
                                                                                                           <*> v .: "width"
                                                                                                           <*> v .: "height"
                                                                                                           <*> v .: "angle"
+                                                                                                          <*> (v .:? "tilt" .!= Strict 9)
                                                                                                )
 
                                                                u -> fail $ "Unknown TrapGeometry type '" ++ u ++ "'"

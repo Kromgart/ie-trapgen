@@ -40,10 +40,11 @@
                             },
                             "geometry": {
                                 "type": "rectangle",
-                                "center": "300,300~5",
-                                "width": "100-101",
+                                "center": "300,300",
+                                "width": "100-110",
                                 "height": "60",
-                                "angle": "45"
+                                "angle": "0",
+                                "tilt": "9"
                             },
                             "transform_not_implemented": [
                                 {

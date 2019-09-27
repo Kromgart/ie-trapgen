@@ -85,17 +85,18 @@ genTph (Parameters efs ars) = do txt <- mconcat <$> mapM genArea ars
         genVerts :: TrapGeometry -> State g Text
 
         genVerts (GeometryPoints pts) = intercalate nest2 <$> mapM (uncurry genCoord) (zip [0..] pts)
-        genVerts (GeometryRect (Rectangle c w h a)) = 
+        genVerts (GeometryRect (Rectangle c w h a t)) = 
           do c' <- genPoint c
              (w1, w2) <- (`divMod` 2) <$> genNumber w
              (h1, h2) <- (`divMod` 2) <$> genNumber h
-             a' <- ((* pi) . (/ 180) . fromIntegral)  <$> genNumber a
+             a' <- (* pi) . (/ 180) . fromIntegral  <$> genNumber a
+             t' :: Double <- (/ 10.0) . fromIntegral <$> genNumber t
              let left    = 0 - w1
                  top     = 0 - h1
                  right   = 0 + w1 + w2
                  bottom  = 0 + h1 + h2
 
-                 move = offset c' . rotate a'
+                 move = offset c' . isoTilt t' . rotate a'
 
                  pts = move <$> [ Point left top
                                 , Point right top
@@ -154,6 +155,10 @@ rotate a (Point x y) = let sina = sin a
 
 offset :: Point Int -> Point Int -> Point Int
 offset (Point x1 y1) (Point x2 y2) = Point (x1 + x2) (y1 + y2)
+
+
+isoTilt :: Double -> Point Int -> Point Int
+isoTilt t (Point x y) = Point x $ round $ t * (fromIntegral y)
 
 
 kickItem :: Int -> [a] -> [a]
