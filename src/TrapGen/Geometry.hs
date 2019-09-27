@@ -40,7 +40,7 @@ instance FromJSON TrapGeometry where
                                                                                                           <*> v .: "width"
                                                                                                           <*> v .: "height"
                                                                                                           <*> v .: "angle"
-                                                                                                          <*> (v .:? "tilt" .!= Strict 9)
+                                                                                                          <*> (v .:? "tilt" .!= Strict 8)
                                                                                                )
 
                                                                u -> fail $ "Unknown TrapGeometry type '" ++ u ++ "'"

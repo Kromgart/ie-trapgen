@@ -141,7 +141,7 @@ A rectangle with defined width and height is created with center at \[0,0], rota
   "height": "60",         // RANDOM: rectangle height before rotation is applied
   "angle": "45",          // RANDOM: rotation angle (degrees, clockwise) before offset to the new center
   "tilt": "8",            // RANDOM: tilt factor to compensate for isometry distortion.
-                          // Optional. Default value = 9.
+                          // Optional. Default value = 8.
   "center": "300~20,415~20"   // POINT: final center point of the rectangle
 }
 ```
