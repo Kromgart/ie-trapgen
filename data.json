@@ -26,6 +26,7 @@
         {
             "id":"AR2602",
             "clear":true,
+            "pick":"0-1",
             "groups":[
                 {
                     "id":"group1",

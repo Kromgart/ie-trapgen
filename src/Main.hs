@@ -47,16 +47,18 @@ genTph (Parameters efs ars) = do txt <- mconcat <$> mapM genArea ars
 
        
         genArea :: Area -> State g Text
-        genArea (Area (TextId a_id) clr grps) = do txt <- mconcat <$> mapM genGroup grps
-                                                   return $ T.concat ["COPY_EXISTING ~", a_id, ".ARE~ ~override/", a_id, ".ARE~\n\n"
-                                                                     , if clr then "LPF delete_normal_traps END\n\n" else mempty
-                                                                     , txt
-                                                                     ]
+        genArea (Area (TextId a_id) clr pk grps') = 
+          do grps <- pickItems' pk grps'
+             txt <- mconcat <$> mapM genGroup grps
+             return $ T.concat ["COPY_EXISTING ~", a_id, ".ARE~ ~override/", a_id, ".ARE~\n\n"
+                               , if clr then "LPF delete_normal_traps END\n\n" else mempty
+                               , txt
+                               ]
 
         genGroup :: TrapGroup -> State g Text
-        genGroup (TrapGroup (TextId gid) tps pick) = do picked <- pickTraps
-                                                        txt <- mconcat <$> mapM genTrap picked
-                                                        return $ "// GROUP " <> gid <> ":\n\n" <> txt
+        genGroup (TrapGroup (TextId gid) tps pk) = do picked <- pickItems' pk tps
+                                                      txt <- mconcat <$> mapM genTrap picked
+                                                      return $ "// GROUP " <> gid <> ":\n\n" <> txt
 
           where genTrap :: Trap -> State g Text
                 genTrap t = do verts <- genVerts (trap_geometry t)
@@ -71,15 +73,6 @@ genTph (Parameters efs ars) = do txt <- mconcat <$> mapM genArea ars
                                                  , nest1, "STR_VAR trap_script = ~", script, "~ trap_name = ~", prefix, "~\n"
                                                  , "END\n\n"
                                                  ]
-                pickTraps :: State g [Trap]
-                pickTraps = 
-                  case pick of Nothing -> return tps
-                               Just n' -> do n <- genNumber n'
-                                             let ltps = length tps
-                                             if (n >= ltps) then return tps
-                                             else if (n <= 0) then return []
-                                             else do idx <- mapM (\i -> genNumber $ Range 0 (i - 1)) [ltps, (ltps - 1) .. n + 1]
-                                                     return $ foldl' (\xs d -> kickItem d xs) tps idx
 
 
         genVerts :: TrapGeometry -> State g Text
@@ -169,4 +162,16 @@ kickItem i ls = let (xs, ys) = splitAt i ls in
                            [] -> xs
 
 
+pickItems :: RandomGen g => Int -> [a] -> State g [a]
+pickItems n tps = let ltps = length tps in
+                  if (n >= ltps) then return tps
+                  else if (n <= 0) then return []
+                  else do idx <- mapM (\i -> genNumber $ Range 0 (i - 1)) [ltps, (ltps - 1) .. n + 1]
+                          return $ foldl' (\xs d -> kickItem d xs) tps idx
+
+
+pickItems' :: RandomGen g => Maybe Number -> [a] -> State g [a]
+pickItems' Nothing tps = return tps
+pickItems' (Just n') tps = do n <- genNumber n'
+                              pickItems n tps
 

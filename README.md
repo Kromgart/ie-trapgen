@@ -71,6 +71,8 @@ See [data.json](./data.json) for reference.
   "id": "AR2602",   // STRING: area to modify
   "clear": true,    // BOOL:  'true' to delete existing 'normal' traps from the area before adding anything.
                     // Optional, default value is false.
+  "pick": "0-1"     // RANDOM: amount of groups to use from the "groups" array
+                    // Optional: if missing, then all groups will be used
   "groups": []      // ARRAY: list of trap groups
 }
 ```

@@ -82,6 +82,7 @@ instance FromJSON TrapGroup where
 
 data Area = Area { area_id     :: TextId Area
                  , area_clear  :: Bool
+                 , area_pick   :: Maybe Number
                  , area_groups :: [TrapGroup]
                  }
                  deriving Show
@@ -90,6 +91,7 @@ data Area = Area { area_id     :: TextId Area
 instance FromJSON Area where
     parseJSON = withObject "Area" $ \v -> Area <$> v .: "id"
                                                <*> v .:? "clear" .!= False
+                                               <*> v .:? "pick"
                                                <*> v .: "groups"
 
 
