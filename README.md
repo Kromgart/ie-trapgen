@@ -44,23 +44,15 @@ See [data.json](./data.json) for reference.
 **/(JSON root object):**
 ```
 {
-  "random_effects": [], // ARRAY: list of random effects 'flavors'. Used in randomization of trap effects
+  "random_effects": [], // ARRAY: list of random effects 'groups'. Used in randomization of trap effects
   "areas" : []          // ARRAY: list of areas to modify
 }
 ```
 
 /random_effects/\[**effects group**\]
 ```
-{
-  "flavor" : "common",  // STRING: name of effects group (for example "undead", "mages", "kobolds")
-  "tiers" : []          // ARRAY: list of effect 'tiers' (flavor subgroups)
-}
-```
-
-/random_effects/\[flavor\]/\[**tier**\]
-```
 { 
-  "id": "arrows",   // STRING: name of this tier
+  "id": "arrows",   // STRING: name of this group
   "scripts" : []    // ARRAY: list of strings, which are names of trap BCS scripts (for example ["GTAR","GTAR5"])
 }
 ```
@@ -112,8 +104,7 @@ See [data.json](./data.json) for reference.
 ```
 {
   "type":"random",      // must be "random" for random effect
-  "flavor_id":"common", // STRING: id of one of effect groups from /random_effects/*
-  "tier_id":"arrows"    // STRING: id of one of tiers from /random_effects/[flavor]/*
+  "group_id":"arrows"   // STRING: id of one of groups from /random_effects/[group]/*
 }
 ```
 

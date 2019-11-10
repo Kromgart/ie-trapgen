@@ -102,14 +102,12 @@ genTph (Parameters efs ars) = do txt <- mconcat <$> mapM genArea ars
 
         genScript :: TrapEffect -> State g Text
         genScript (EffectFixed s) = return s
-        genScript (EffectRandom f_id t_id) = 
-            case find ((f_id==) . flavor_id) efs of 
-                 Nothing -> error $ "Flavor '" ++ show f_id ++ "'not found"
-                 Just f -> case find ((t_id==) . tier_id) (flavor_tiers f) of
-                                Nothing -> error $ "Tier '" ++ show t_id ++ "' not found in flavor '" ++ show f_id ++ "'"
-                                Just t -> let ss = tier_scripts t in
-                                          do i <- genNumber $ Range 0 (length ss - 1)
-                                             return $ ss !! i
+        genScript (EffectRandom g_id) = 
+            case find ((g_id==) . effectgroup_id) efs of 
+                 Nothing -> error $ "Effect group '" ++ show g_id ++ "'not found"
+                 Just g -> let ss = effectgroup_scripts g in
+                           do i <- genNumber $ Range 0 (length ss - 1)
+                              return $ ss !! i
 
 
         genPoint :: Point Number -> State g (Point Int)

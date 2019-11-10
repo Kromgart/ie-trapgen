@@ -35,15 +35,14 @@ instance FromJSON (TextId a) where
 
 
 data TrapEffect = EffectFixed Text
-                | EffectRandom (TextId EffectFlavor) (TextId EffectTier)
+                | EffectRandom (TextId EffectGroup)
                 deriving Show
 
 
 instance FromJSON TrapEffect where
     parseJSON = withObject "TrapEffect" $ \v -> do t <- v .: "type"
                                                    case t of "fixed" -> EffectFixed <$> v .: "script"
-                                                             "random" -> EffectRandom <$> v .: "flavor_id"
-                                                                                      <*> v .: "tier_id"
+                                                             "random" -> EffectRandom <$> v .: "group_id"
 
                                                              u -> fail $ "Unknown TrapEffect type '" ++ u ++ "'"
 
@@ -95,30 +94,20 @@ instance FromJSON Area where
                                                <*> v .: "groups"
 
 
-data EffectTier = EffectTier { tier_id      :: TextId EffectTier
-                             , tier_scripts :: [Text]
-                             }
-                             deriving Show
+data EffectGroup = EffectGroup { effectgroup_id      :: TextId EffectGroup
+                               , effectgroup_scripts :: [Text]
+                               }
+                               deriving Show
 
 
-instance FromJSON EffectTier where
-    parseJSON = withObject "Tier" $ \v -> EffectTier <$> v .: "id"
-                                                     <*> v .: "scripts"
-
-
-data EffectFlavor = EffectFlavor { flavor_id    :: TextId EffectFlavor
-                                 , flavor_tiers :: [EffectTier]
-                                 }
-                                 deriving Show
-
-
-instance FromJSON EffectFlavor where
-    parseJSON = withObject "Flavor" $ \v -> EffectFlavor <$> v .: "flavor"
-                                                         <*> v .: "tiers"
+instance FromJSON EffectGroup where
+    parseJSON = withObject "EffectGroup" $ \v -> EffectGroup <$> v .: "id"
+                                                             <*> v .: "scripts"
 
 
 
-data Parameters = Parameters [EffectFlavor] [Area]
+
+data Parameters = Parameters [EffectGroup] [Area]
                   deriving Show
 
 

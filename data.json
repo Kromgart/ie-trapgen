@@ -1,23 +1,17 @@
 {
     "random_effects":[
         {
-            "flavor": "common",
-            "tiers": [
-                { 
-                    "id": "arrows",
-                    "scripts" : [
-                        "GTAR",
-                        "GTAR3"
-                    ]
-                },
-                { 
-                    "id": "spells",
-                    "scripts" : [
-                        "MMISS1",
-                        "CHORB"
-                    ]
-                }
-
+            "id": "arrows",
+            "scripts" : [
+                "GTAR",
+                "GTAR3"
+            ]
+        },
+        { 
+            "id": "spells",
+            "scripts" : [
+                "MMISS1",
+                "CHORB"
             ]
         }
     ],
@@ -79,8 +73,7 @@
                             "disarm":"30",
                             "effect":{
                                 "type":"random",
-                                "flavor_id":"common",
-                                "tier_id":"spells"
+                                "group_id":"spells"
                             },
                             "geometry": {
                                 "type": "points",
