@@ -3,15 +3,6 @@
 module TrapGen.Geometry where
 
 
-import Data.Aeson ( withObject
-                  , FromJSON
-                  , parseJSON
-                  , (.:)
-                  , (.:?)
-                  , (.!=)
-                  )
-
-
 import TrapGen.Number
 import TrapGen.Point
 
@@ -31,19 +22,6 @@ data Rectangle = Rectangle { center :: Coord
 data TrapGeometry = GeometryPoints [Coord]
                   | GeometryRect Rectangle
                   deriving Show
-
-
-instance FromJSON TrapGeometry where
-    parseJSON = withObject "TrapGeometry" $ \v -> do t <- v .: "type"
-                                                     case t of "points" -> GeometryPoints <$> v .: "points"
-                                                               "rectangle" -> GeometryRect <$> (Rectangle <$> v .: "center"
-                                                                                                          <*> v .: "width"
-                                                                                                          <*> v .: "height"
-                                                                                                          <*> v .: "angle"
-                                                                                                          <*> (v .:? "tilt" .!= Strict 8)
-                                                                                               )
-
-                                                               u -> fail $ "Unknown TrapGeometry type '" ++ u ++ "'"
 
 
 

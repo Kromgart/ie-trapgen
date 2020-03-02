@@ -1,15 +1,11 @@
 module TrapGen.Number where
 
-import Data.Aeson ( withText
-                  , FromJSON
-                  , parseJSON
-                  )
 
 import Data.Text (unpack)
 import Control.Monad.Trans.State.Strict (State, state)
 import System.Random (RandomGen, randomR)
 
--- TODO: switch Read to attoparsec later
+-- TODO: switch Read to megaparsec later
 import Text.ParserCombinators.ReadPrec (ReadPrec, (<++))
 import Text.Read (readPrec, readEither, get)
 
@@ -48,8 +44,5 @@ instance Read Number where
    readPrec = readRange <++ readDelta <++ readStrict
 
 
-instance FromJSON Number where
-    parseJSON = withText "Number" $ \t -> case (readEither $ unpack t) of Right n -> pure n
-                                                                          Left e -> fail e
- 
+
 

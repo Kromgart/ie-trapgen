@@ -19,19 +19,19 @@ extra-source-files:  CHANGELOG.md
 executable trapgen
   main-is:             Main.hs
 
-  other-modules:       TrapGen.Number
-                     , TrapGen.Point
-                     , TrapGen.Geometry
-                     , TrapGen.InputDefinitions
+  other-modules:    
+                       TrapGen.Types
+                     , TrapGen.Types.TH
+                     , TrapGen.Types.Randomized
 
   -- other-extensions:
   build-depends:       base >=4.12 && <4.13
-                     , aeson >= 1.4 && <1.5
                      , text
                      , bytestring >= 0.10 && <0.11
-                     , vector >= 0.12 && <0.13
                      , random >= 1.1 && <1.2
                      , transformers
+                     , template-haskell
+                     , megaparsec >= 8 && <8.1
 
   hs-source-dirs:      src
   default-language:    Haskell2010

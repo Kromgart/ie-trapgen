@@ -1,0 +1,79 @@
+
+# Values
+
+String s1    = "Some name"
+Script ef_mm = "MMISS1"
+
+
+# Random values
+#
+# class Randomizable a where
+#   derandom :: RandomGen g => a -> State g a
+#
+#  
+
+data RInt = Exact Int
+          | Range Int Int
+          | Delta Int Int
+
+
+data RQuant a = All [a]
+              | SomeOf [a] RInt
+
+
+newtype RPoint = (Rint, Rint)
+
+data RRect = RRect { center :: RPoint
+                     width  :: RInt
+                     height :: RInt
+                     angle  :: RInt
+                     scaleY :: RInt
+                   }
+
+
+data RGeometry = Points [RPoint]
+               | Rect RRect
+
+
+newtype RScript = RScript (RQuant String)
+
+
+data RTrap = RTrap { detect :: RInt
+                     disarm :: RInt
+                     effect :: RScript
+                     geometry :: RGeometry
+                   }
+
+newtype TrapGroup = TrapGroup (RQuant RTrap)
+
+
+
+
+
+Trap t1 = 30 30 eff_mm 
+
+
+
+Group<Script> effect_arrows =  [ "GTAR", "GTAR3" ]
+Group<Script> effect_group1 = [ effect_arrows, effect_mm ]
+
+
+Group a 
+
+pick :: Group a -> Int -> Either ( Group a ) ErrStr
+
+pickOne :: Group a -> Either a ErrStr
+
+
+
+
+
+trap_50x50 = TRAP 30 30 (PICK effect_group1) (RECT 0 0 49 49)
+
+traps_cb = [trap_50x50, trap_50x50 WITH _ _ _ (RECT 50 50 99 99)]
+
+
+UPDATE AREA "AR2602"
+    TRAPS DELETE
+    TRAPS ADD traps_cb
+

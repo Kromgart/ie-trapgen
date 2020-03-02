@@ -1,14 +1,9 @@
 module TrapGen.Point where
 
 
-import Data.Aeson ( withText
-                  , FromJSON
-                  , parseJSON
-                  )
-
 import Data.Text (unpack)
 
--- TODO: switch to attoparsec later
+-- TODO: switch to megaparsec later
 
 import Text.ParserCombinators.ReadPrec
 import Text.Read
@@ -54,10 +49,5 @@ instance Read a => Read (Point a) where
                  if (c /= ',') then fail "Failed to parse a pair: expected `,`"
                                else Point x <$> readPrec
 
-
-instance Read a => FromJSON (Point a) where
-    parseJSON = withText "Point" $ \t -> let s = unpack t in
-                                         case readEither s of Right c -> return c
-                                                              Left e -> fail $ "Coord (" ++ s ++ ") couldn't be parsed: " ++ e
 
 
