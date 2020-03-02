@@ -4,6 +4,9 @@
 module Main where
 
 import TrapGen.Types
+import TrapGen.Types.TH
+import TrapGen.Types.Randomized
+
 
 import Data.Text (Text, pack) --, unpack, intercalate)
 --import qualified Data.Text as T
@@ -12,7 +15,16 @@ import Data.Text (Text, pack) --, unpack, intercalate)
 
 
 main :: IO ()
-main = pure "123" >>= putStrLn 
+--main = pure "123" >>= putStrLn 
+main = putStrLn $ show [g1, g2]
+  where g1 :: GeometryRnd
+        g1 = PointsRnd $ All [ PointRnd (Exact 1) (Exact 1)
+                             , PointRnd (Exact 5) (Exact 5) ]
+        g2 :: GeometryRnd
+        g2 = PointsRnd $ SomeOf [ PointRnd (Delta 2 1) (Exact 1)
+                                , PointRnd (Exact 5) (Range 5 10) ]
+                                (Range 1 2)
+
 
 
 

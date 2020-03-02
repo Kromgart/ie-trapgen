@@ -11,17 +11,6 @@ import Data.Text (Text)
 --type Coord = Point Number
 
 
-data Enum a => ROrd a = Exact a
-                      | Range a a
-                      | Delta a Int
-                      deriving (Show)
-
-
-data RQuant a = One a
-              | All [a]
-              | SomeOf [a] Int
-              deriving (Show)
-
 
 data Point = Point { x :: Int
                    , y :: Int
